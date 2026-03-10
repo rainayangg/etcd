@@ -133,6 +133,10 @@ type ServerConfig struct {
 	// streams that each client can open at a time.
 	MaxConcurrentStreams uint32
 
+	// GRPCNumStreamWorkers specifies the number of gRPC stream workers.
+	// Zero disables the worker pool and spawns a goroutine per stream.
+	GRPCNumStreamWorkers uint32
+
 	WarningApplyDuration        time.Duration
 	WarningUnaryRequestDuration time.Duration
 
