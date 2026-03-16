@@ -67,6 +67,7 @@ const (
 	DefaultMaxRequestBytes             = 1.5 * 1024 * 1024
 	DefaultMaxConcurrentStreams        = math.MaxUint32
 	DefaultGRPCNumStreamWorkers        = uint32(0)
+	DefaultGRPCInitialConnWindowSize   = uint32(0)
 	DefaultGRPCKeepAliveMinTime        = 5 * time.Second
 	DefaultGRPCKeepAliveInterval       = 2 * time.Hour
 	DefaultGRPCKeepAliveTimeout        = 20 * time.Second
@@ -272,6 +273,10 @@ type Config struct {
 	// MaxConcurrentStreams specifies the maximum number of concurrent
 	// streams that each client can open at a time.
 	MaxConcurrentStreams uint32 `json:"max-concurrent-streams"`
+
+	// GRPCInitialConnWindowSize sets the initial HTTP/2 connection window
+	// size for the gRPC server. Zero keeps the gRPC default.
+	GRPCInitialConnWindowSize uint32 `json:"grpc-initial-conn-window-size"`
 
 	// GRPCNumStreamWorkers specifies the number of gRPC stream workers.
 	// Zero disables workers and uses one goroutine per stream.
@@ -659,11 +664,12 @@ func NewConfig() *Config {
 		ExperimentalSnapshotCatchUpEntries: etcdserver.DefaultSnapshotCatchUpEntries,
 		SnapshotCatchUpEntries:             etcdserver.DefaultSnapshotCatchUpEntries,
 
-			MaxTxnOps:            DefaultMaxTxnOps,
-			MaxRequestBytes:      DefaultMaxRequestBytes,
-			MaxConcurrentStreams: DefaultMaxConcurrentStreams,
-			GRPCNumStreamWorkers: DefaultGRPCNumStreamWorkers,
-			WarningApplyDuration: DefaultWarningApplyDuration,
+		MaxTxnOps:                 DefaultMaxTxnOps,
+		MaxRequestBytes:           DefaultMaxRequestBytes,
+		MaxConcurrentStreams:      DefaultMaxConcurrentStreams,
+		GRPCInitialConnWindowSize: DefaultGRPCInitialConnWindowSize,
+		GRPCNumStreamWorkers:      DefaultGRPCNumStreamWorkers,
+		WarningApplyDuration:      DefaultWarningApplyDuration,
 
 		GRPCKeepAliveMinTime:  DefaultGRPCKeepAliveMinTime,
 		GRPCKeepAliveInterval: DefaultGRPCKeepAliveInterval,
@@ -795,6 +801,7 @@ func (cfg *Config) AddFlags(fs *flag.FlagSet) {
 	fs.BoolVar(&cfg.SocketOpts.ReuseAddress, "socket-reuse-address", cfg.SocketOpts.ReuseAddress, "Enable to set socket option SO_REUSEADDR on listeners allowing binding to an address in `TIME_WAIT` state.")
 
 	fs.Var(flags.NewUint32Value(cfg.MaxConcurrentStreams), "max-concurrent-streams", "Maximum concurrent streams that each client can open at a time.")
+	fs.Var(flags.NewUint32Value(cfg.GRPCInitialConnWindowSize), "grpc-initial-conn-window-size", "Initial HTTP/2 connection window size in bytes for the gRPC server (0 to keep the default).")
 	fs.Var(flags.NewUint32Value(cfg.GRPCNumStreamWorkers), "grpc-num-stream-workers", "Number of gRPC stream workers to run. Zero disables the worker pool.")
 
 	// raft connection timeouts
@@ -1279,6 +1286,12 @@ func (cfg *Config) Validate() error {
 	}
 	if cfg.ElectionMs > maxElectionMs {
 		return fmt.Errorf("--election-timeout[%vms] is too long, and should be set less than %vms", cfg.ElectionMs, maxElectionMs)
+	}
+	if cfg.GRPCInitialConnWindowSize != 0 && cfg.GRPCInitialConnWindowSize < 65536 {
+		return fmt.Errorf("--grpc-initial-conn-window-size must be 0 or at least 65536 (set to %d)", cfg.GRPCInitialConnWindowSize)
+	}
+	if cfg.GRPCInitialConnWindowSize > math.MaxInt32 {
+		return fmt.Errorf("--grpc-initial-conn-window-size must be <= %d (set to %d)", math.MaxInt32, cfg.GRPCInitialConnWindowSize)
 	}
 
 	// check this last since proxying in etcdmain may make this OK

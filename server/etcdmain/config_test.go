@@ -61,6 +61,18 @@ func TestConfigParsingMemberFlags(t *testing.T) {
 	validateMemberFlags(t, cfg)
 }
 
+func TestConfigParsingGRPCInitialConnWindowSizeFlag(t *testing.T) {
+	args := []string{
+		"-advertise-client-urls=http://localhost:2379",
+		"-grpc-initial-conn-window-size=65536",
+	}
+
+	cfg := newConfig()
+	err := cfg.parse(args)
+	require.NoError(t, err)
+	assert.Equal(t, uint32(65536), cfg.ec.GRPCInitialConnWindowSize)
+}
+
 func TestConfigFileMemberFields(t *testing.T) {
 	yc := struct {
 		Dir                    string `json:"data-dir"`

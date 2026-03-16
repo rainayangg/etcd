@@ -133,6 +133,10 @@ type ServerConfig struct {
 	// streams that each client can open at a time.
 	MaxConcurrentStreams uint32
 
+	// GRPCInitialConnWindowSize sets the initial HTTP/2 connection window
+	// size for the gRPC server. Zero keeps the gRPC default.
+	GRPCInitialConnWindowSize uint32
+
 	// GRPCNumStreamWorkers specifies the number of gRPC stream workers.
 	// Zero disables the worker pool and spawns a goroutine per stream.
 	GRPCNumStreamWorkers uint32

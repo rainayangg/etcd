@@ -19,6 +19,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"math"
 	"net"
 	"net/url"
 	"os"
@@ -792,6 +793,48 @@ func TestLeaseCheckpointValidate(t *testing.T) {
 			if (err != nil) != tc.expectError {
 				t.Errorf("config.Validate() = %q, expected error: %v", err, tc.expectError)
 			}
+		})
+	}
+}
+
+func TestGRPCInitialConnWindowSizeValidate(t *testing.T) {
+	tcs := []struct {
+		name        string
+		value       uint32
+		expectError string
+	}{
+		{
+			name:  "default",
+			value: 0,
+		},
+		{
+			name:  "minimum valid",
+			value: 65536,
+		},
+		{
+			name:        "below grpc minimum",
+			value:       65535,
+			expectError: "--grpc-initial-conn-window-size must be 0 or at least 65536",
+		},
+		{
+			name:        "above int32 max",
+			value:       uint32(math.MaxInt32) + 1,
+			expectError: fmt.Sprintf("--grpc-initial-conn-window-size must be <= %d", math.MaxInt32),
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := *NewConfig()
+			cfg.GRPCInitialConnWindowSize = tc.value
+
+			err := cfg.Validate()
+			if tc.expectError == "" {
+				require.NoError(t, err)
+				return
+			}
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), tc.expectError)
 		})
 	}
 }

@@ -205,11 +205,12 @@ func StartEtcd(inCfg *Config) (e *Etcd, err error) {
 		BackendBatchLimit:                 cfg.BackendBatchLimit,
 		BackendFreelistType:               backendFreelistType,
 		BackendBatchInterval:              cfg.BackendBatchInterval,
-			MaxTxnOps:                         cfg.MaxTxnOps,
-			MaxRequestBytes:                   cfg.MaxRequestBytes,
-			MaxConcurrentStreams:              cfg.MaxConcurrentStreams,
-			GRPCNumStreamWorkers:              cfg.GRPCNumStreamWorkers,
-			SocketOpts:                        cfg.SocketOpts,
+		MaxTxnOps:                         cfg.MaxTxnOps,
+		MaxRequestBytes:                   cfg.MaxRequestBytes,
+		MaxConcurrentStreams:              cfg.MaxConcurrentStreams,
+		GRPCInitialConnWindowSize:         cfg.GRPCInitialConnWindowSize,
+		GRPCNumStreamWorkers:              cfg.GRPCNumStreamWorkers,
+		SocketOpts:                        cfg.SocketOpts,
 		StrictReconfigCheck:               cfg.StrictReconfigCheck,
 		ClientCertAuthEnabled:             cfg.ClientTLSInfo.ClientCertAuth,
 		AuthToken:                         cfg.AuthToken,
@@ -358,6 +359,7 @@ func print(lg *zap.Logger, ec Config, sc config.ServerConfig, memberInitialized 
 		zap.Int64("quota-backend-bytes", quota),
 		zap.Uint("max-request-bytes", sc.MaxRequestBytes),
 		zap.Uint32("max-concurrent-streams", sc.MaxConcurrentStreams),
+		zap.Uint32("grpc-initial-conn-window-size", sc.GRPCInitialConnWindowSize),
 		zap.Uint32("grpc-num-stream-workers", sc.GRPCNumStreamWorkers),
 
 		zap.Bool("pre-vote", sc.PreVote),
@@ -792,6 +794,9 @@ func (e *Etcd) serveClients() {
 			Time:    e.cfg.GRPCKeepAliveInterval,
 			Timeout: e.cfg.GRPCKeepAliveTimeout,
 		}))
+	}
+	if e.cfg.GRPCInitialConnWindowSize > 0 {
+		gopts = append(gopts, grpc.InitialConnWindowSize(int32(e.cfg.GRPCInitialConnWindowSize)))
 	}
 	gopts = append(gopts, e.cfg.GRPCAdditionalServerOptions...)
 

@@ -324,6 +324,7 @@ func (cfg *config) configFromCmdLine() error {
 	cfg.ec.CipherSuites = flags.StringsFromFlag(cfg.cf.flagSet, "cipher-suites")
 
 	cfg.ec.MaxConcurrentStreams = flags.Uint32FromFlag(cfg.cf.flagSet, "max-concurrent-streams")
+	cfg.ec.GRPCInitialConnWindowSize = flags.Uint32FromFlag(cfg.cf.flagSet, "grpc-initial-conn-window-size")
 	cfg.ec.GRPCNumStreamWorkers = flags.Uint32FromFlag(cfg.cf.flagSet, "grpc-num-stream-workers")
 
 	cfg.ec.LogOutputs = flags.UniqueStringsFromFlag(cfg.cf.flagSet, "log-outputs")

@@ -91,6 +91,10 @@ Member:
     Maximum client request size in bytes the server will accept.
   --max-concurrent-streams 'math.MaxUint32'
     Maximum concurrent streams that each client can open at a time.
+  --grpc-initial-conn-window-size '0'
+    Initial HTTP/2 connection window size in bytes for the gRPC server (0 to keep the default).
+  --grpc-num-stream-workers '0'
+    Number of gRPC stream workers to run. Zero disables the worker pool.
   --grpc-keepalive-min-time '5s'
     Minimum duration interval that a client should wait before pinging server.
   --grpc-keepalive-interval '2h'
