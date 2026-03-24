@@ -42,6 +42,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
+replace golang.org/x/net => github.com/rainayangg/net-go v0.0.0-20260313180441-b5081d74e7cf
+
 replace (
 	go.etcd.io/etcd/api/v3 => ../../api
 	go.etcd.io/etcd/client/pkg/v3 => ../pkg

@@ -4,9 +4,9 @@ go 1.24.0
 
 toolchain go1.24.13
 
-replace google.golang.org/grpc => /home/ubuntu/grpc-go
+//replace google.golang.org/grpc => github.com/rainayangg/grpc-go v0.0.0-20260323012820-e14ec242a84d
 
-replace golang.org/x/net => /home/ubuntu/net-go
+replace golang.org/x/net => github.com/rainayangg/net-go v0.0.0-20260313180441-b5081d74e7cf
 
 require (
 	github.com/coreos/go-semver v0.3.1

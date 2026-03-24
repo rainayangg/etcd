@@ -4,7 +4,7 @@ go 1.24.0
 
 toolchain go1.24.13
 
-replace golang.org/x/net => /home/ubuntu/net-go
+replace golang.org/x/net => github.com/rainayangg/net-go v0.0.0-20260313180441-b5081d74e7cf
 
 require (
 	github.com/bgentry/speakeasy v0.2.0

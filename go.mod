@@ -13,8 +13,7 @@ replace (
 	go.etcd.io/etcd/pkg/v3 => ./pkg
 	go.etcd.io/etcd/server/v3 => ./server
 	go.etcd.io/etcd/tests/v3 => ./tests
-	golang.org/x/net => /home/ubuntu/net-go
-	google.golang.org/grpc => /home/ubuntu/grpc-go
+	golang.org/x/net => github.com/rainayangg/net-go v0.0.0-20260313180441-b5081d74e7cf
 )
 
 require (
