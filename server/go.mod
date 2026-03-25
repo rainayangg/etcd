@@ -4,7 +4,7 @@ go 1.24.0
 
 toolchain go1.24.13
 
-//replace google.golang.org/grpc => github.com/rainayangg/grpc-go v0.0.0-20260323012820-e14ec242a84d
+//replace google.golang.org/grpc => github.com/rainayangg/grpc-go v0.0.0-20260325212654-3ee8a32617b2
 
 replace golang.org/x/net => github.com/rainayangg/net-go v0.0.0-20260313180441-b5081d74e7cf
 
